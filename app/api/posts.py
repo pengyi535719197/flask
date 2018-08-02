@@ -1,7 +1,7 @@
 from . import api
-from .. import auth
-from ..models import Post, Permission, db
-from flask import jsonify, request, url_for, current_app
+from .. import db
+from ..models import Post, Permission
+from flask import jsonify, request, url_for, current_app, g
 from .decorators import permission_required
 from .errors import forbidden
 
@@ -40,8 +40,7 @@ def new_post():
     post.author = g.current_user
     db.session.add(post)
     db.session.commit()
-    return jsonify(post.to_json()), 201, \
-           {'Location': url_for('api.get_post', id=post.id, _external=True)}
+    return jsonify(post.to_json()), 201, {'Location': url_for('api.get_post', id=post.id, _external=True)}
 
 @api.route('/posts/<int:id>', methods=['PUT'])
 @permission_required(Permission.WRITE_ARTICLES)

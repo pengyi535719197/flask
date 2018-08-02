@@ -10,16 +10,16 @@ from .decorators import permission_required
 def get_comments():
     page = request.args.get('page', 1, type=int)
     pagination = Comment.query.order_by(Comment.timestamp.desc()).paginate(
-        page, per_page=current_app.config['FLAKSY_COMMENTS_PER_PAGE'],
+        page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
         error_out=False
     )
     comments = pagination.items
     prev = None
     if pagination.has_prev:
-        prev = url_for('api.get_comments', page=page-1, _external=True)
+        prev = url_for('api.get_comments', page=page-1)
     next = None
     if pagination.has_next:
-        next = url_for('api.get_comments', page=page+1, _external=True)
+        next = url_for('api.get_comments', page=page+1)
     return jsonify({
         'comments': [comment.to_json() for comment in comments],
         'prev': prev,
@@ -37,7 +37,7 @@ def get_post_comments(id):
     post = Post.query.get_or_404(id)
     page = request.args.get('page', 1, type=int)
     pagination = post.comments.order_by(Comment.timestamp.asc()).pageinate(
-        page, per_page=current_app.config['FLASY_COMMENTS_PER_PAGE'],
+        page, per_page=current_app.config['FLASKY_COMMENTS_PER_PAGE'],
         error_out=False
     )
     comments = pagination.items
@@ -63,6 +63,5 @@ def new_post_comment(id):
     comment.post = post
     db.session.add(comment)
     db.session.commint()
-    return jsonify(comment.to_json()), 201, \
-           {'Location': url_for('api.get_comment', id=comment.id)}
+    return jsonify(comment.to_json()), 201, {'Location': url_for('api.get_comment', id=comment.id)}
 

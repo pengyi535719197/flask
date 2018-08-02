@@ -1,4 +1,4 @@
-from flask_httpauth import  HTTPBasicAuth
+from flask_httpauth import HTTPBasicAuth
 from flask import g, jsonify
 from ..models import User
 from . import api
@@ -23,7 +23,7 @@ def verify_password(email_or_token, password):
     g.token_used = False
     return user.verify_password(password)
 
-@api.route('/tokens', methods=['POST'])
+@api.route('/tokens/', methods=['POST'])
 def get_token():
     # 生成认证了令牌
     if g.current_user.is_anonymous or g.token_used:
