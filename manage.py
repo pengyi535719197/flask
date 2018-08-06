@@ -40,6 +40,22 @@ def test(coverage=False):
         COV.html_report(directory=covdir)
         print('HTML version: file://%s/index.html' % covdir)
 
+@manager.command
+def deploy():
+    # 部署
+    from flask_migrate import upgrade
+    from app.models import Role, User
+
+    # 把数据迁移到最新订修版本
+    upgrade()
+
+    # 创建用户角色
+    Role.insert_roles()
+
+    # 让所有用户都关注此角色
+    User.add_self_follows()
+
+
 
 
 if __name__ == '__main__':

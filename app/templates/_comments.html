@@ -19,7 +19,7 @@
                 </a>
             </div>
             <div class="comment.body">
-                {% if comment.disabnled %}
+                {% if comment.disabled %}
                 <p></p><i>这个评论被协管员屏蔽了</i>
                 {% endif %}
                 {% if moderate or not comment.disabled %}
@@ -37,6 +37,7 @@
                 {% else %}
                 <a class="btn btn-danger btn-xs" href="{{ url_for('.moderate_disable', id=comment.id, page=page) }}">屏蔽</a>
                 {% endif %}
+            {% endif %}
         </div>
     </li>
     {% endfor %}

@@ -8,7 +8,7 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
-    FLASKY_MAIL_SENDER = 'Flasky Admin pengyi535719197@gmail.com'
+    FLASKY_MAIL_SENDER = 'pengyi535719197@gmail.com'
     FLASKY_ADMIN = My_email['FLASKY_ADMIN']
     FLASKY_POSTS_PER_PAGE = 20
     FLASKY_FOLLOWERS_PER_PAGE = 20
@@ -25,25 +25,59 @@ class DevelopmentConfig(Config):
     MAIL_USE_TLS = True
     MAIL_USERNAME = My_email['MAIL_USERNAME']
     MAIL_PASSWORD = My_email['MAIL_PASSWORD']
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
-                              'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
+    # 使用SQLlite数据库
+    # SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
+    #                           'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
+    # 使用MySQL数据库
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:mysql@localhost:3306/flask'
 
 
 
 class TestingConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
-                              'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')
+    # 使用SQLlite数据库
+    # SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
+    #                           'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')
+    # 使用MySQL数据库
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:mysql@localhost:3306/flask'
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-                              'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+    # 使用SQLlite数据库
+    # SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+    #                           'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+    # 使用MySQL数据库
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:mysql@localhost:3306/flask'
+
+    # 程序错误时发送电子邮件
+    @classmethod
+    def init_app(cls, app):
+        Config.init_app(app)
+
+        # 把错误日志发给管理员
+        import logging
+        from logging.handlers import SMTPHandler
+        credentials = None
+        secure = None
+        if getattr(cls, 'MAIL_USERNAME', None) is not None:
+            credentials = (cls.MAIL_USERNAME, cls.MAIL_PASSWORD)
+            if getattr(cls, 'MAIL_USE_YLS', None):
+                secure = ()
+            mail_handler = SMTPHandler(
+                mailhost=(cls.MAIL_SERVER, cls.MAIL_PORT),
+                fromaddr=cls.FLASKY_MAIL_SENDER,
+                toaddrs=[cls.FLASKY_ADMIN],
+                subject=cls.FLASKY_MAIL_SUBJECT_PREFIX + ' Application Error',
+                credentials=credentials,
+                secure=secure
+            )
+            mail_handler.setLevel(logging.ERROR)
+            app.logger.addHandler(mail_handler)
 
 
 config = {
-    'development' : DevelopmentConfig,
-    'testing' : TestingConfig,
-    'prdouction' : ProductionConfig,
-    'default' : DevelopmentConfig
+    'development': DevelopmentConfig,
+    'testing': TestingConfig,
+    'prdouction': ProductionConfig,
+    'default': DevelopmentConfig
 }
