@@ -67,9 +67,6 @@ class Permission:
     ADMINISTER = 16
 
 
-
-
-
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
@@ -132,7 +129,6 @@ class Role(db.Model):
 
     def __repr__(self):
         return '<Role %r>' % self.name
-
 
 
 class User(UserMixin, db.Model):
@@ -338,7 +334,6 @@ class User(UserMixin, db.Model):
             'post_count': self.posts.count()
         }
         return json_user
-
 
     def __repr__(self):
         return '<User %r>' % self.username
